@@ -1,7 +1,7 @@
 [project]
 name = "deal-radar"
 version = "0.1.0"
-description = "Watches stores for underpriced items, checks each find against the market, and asks a person before anything is bought."
+description = "Watches stores for underpriced items, checks each find against what other sellers are asking, and asks a person before anything is bought."
 requires-python = ">=3.11"
 license = "MIT"
 dependencies = [

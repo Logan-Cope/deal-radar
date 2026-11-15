@@ -1,12 +1,14 @@
 # deal-radar
 
-Agents find the deals, a person approves every buy.
+Software finds the deals, a person approves every buy.
 
 [![CI](https://github.com/Logan-Cope/deal-radar/actions/workflows/ci.yml/badge.svg)](https://github.com/Logan-Cope/deal-radar/actions/workflows/ci.yml)
 
 ![The demo: a radar card arrives, a tap on Bought puts the item in the ledger, and a free-form note becomes a suggestion card with its evidence highlighted](docs/media/demo.gif)
 
-deal-radar watches online stores for underpriced pieces, checks each find against what the rest of the market charges, and sends a card to a person's phone with the evidence attached. The person taps Bought or Skip. A buy lands in a ledger, where a free-form note like "listed the boots on ebay yesterday for 425" is read by Claude into suggested changes, each with the quote that backs it. Nothing is written until the person taps Apply, and nothing in this repository can spend money.
+deal-radar watches online stores for underpriced pieces, checks each find against what other sellers are asking for the same piece right now, and sends a card to a person's phone with the evidence attached. The person taps Bought or Skip. A buy lands in a ledger, where a free-form note like "listed the boots on ebay yesterday for 425" is read by Claude into suggested changes, each with the quote that backs it. Nothing is written until the person taps Apply, and nothing in this repository can spend money.
+
+The finding is plain code: polling, diffing, rules and a price comparison, with no model in the loop. The one model call is the note reader.
 
 It is a public rewrite of a radar I run for my own resale buying. Every store, brand, price and person in it is invented, and the demo runs on fixtures with no API keys.
 
@@ -47,7 +49,7 @@ flowchart LR
     S[Store catalogues<br/>and news feeds] -->|poll, 304s cached| D[Differ<br/>SQLite]
     D -->|new, price drop, restock| R[Scorer<br/>config rules]
     R --> Q[Dedupe]
-    Q --> C{Comp gate<br/>what do others charge?}
+    Q --> C{Comp gate<br/>what are other sellers asking?}
     C -->|KILL| K[Logged with the reason]
     C -->|PASS or SCARCE| P[Card on the phone<br/>with the evidence]
     P -->|person taps Bought| O[Push queue<br/>never drops an event]
@@ -58,7 +60,7 @@ flowchart LR
     G -->|person taps Apply| L
 ```
 
-The radar (`radar/`, Python) polls each store's public catalogue once per cycle, diffs it against the last cycle, and scores what changed. A find that clears the discount bar goes to the **comp gate**, which searches for the same item at other sellers and only lets it through when the cheapest credible offer is far above ours. The matching rules, the outlier guard and the "scarce" verdict are in [`radar/src/deal_radar/comps.py`](radar/src/deal_radar/comps.py).
+The radar (`radar/`, Python) polls each store's public catalogue once per cycle, diffs it against the last cycle, and scores what changed. A find that clears the discount bar goes to the **comp gate**, which searches for the same item at other sellers and only lets it through when the cheapest credible asking price is far above ours. These are current listings, not sold prices: the floor says what nobody else is undercutting today, not what the piece will sell for. The matching rules, the outlier guard and the "scarce" verdict are in [`radar/src/deal_radar/comps.py`](radar/src/deal_radar/comps.py).
 
 The ledger (`dashboard/`, Next.js) takes the radar's events through one endpoint that applies each event exactly once, and keeps every buy from card to sale. Its stage (on the way, arrived, posted, sold) is derived from dates, never stored.
 

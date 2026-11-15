@@ -12,7 +12,7 @@ The calls that shaped this design, with what was given up for each.
 
 ## A comp gate, not a bigger discount bar
 
-**Decision:** a find has to clear two bars. First the store's own discount, then the market: the cheapest credible offer elsewhere must be at least 2.5x our price and leave $150 after fees and shipping.
+**Decision:** a find has to clear two bars. First the store's own discount, then what other sellers are asking: the cheapest credible listing elsewhere, at today's asking price, must be at least 2.5x our price and leave $150 after fees and shipping. Asking prices are what a shopping search can see; they are a ceiling on what anyone is undercutting today, not a record of what the piece sells for.
 
 **Why:** a markdown is the seller's claim. A 75% discount on something sold everywhere at that price is not a deal. Raising the discount bar does not fix that; it only makes the channel quieter while still letting through the same false positives. When the channel is too quiet, the ratio and headroom bars are the ones to loosen.
 

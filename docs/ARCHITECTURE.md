@@ -1,6 +1,6 @@
 # Architecture
 
-Two programs and one contract between them. The radar (`radar/`, Python) finds and checks deals and carries a person's decisions out. The ledger (`dashboard/`, Next.js) keeps every buy from card to sale and reads a person's notes into suggested changes. The contract is a list of events, each with an id the ledger applies exactly once.
+Two programs and one contract between them. The radar (`radar/`, Python) finds and checks deals with rules and a price comparison, no model involved, and carries a person's decisions out. The ledger (`dashboard/`, Next.js) keeps every buy from card to sale and uses Claude for one job: reading a person's notes into suggested changes. The contract is a list of events, each with an id the ledger applies exactly once.
 
 ## 1. One radar cycle
 
@@ -41,7 +41,7 @@ flowchart TD
 
 ### The comp gate
 
-A markdown is the seller's claim; a comp is evidence. For each find the gate searches for the same piece elsewhere and asks how far the cheapest credible offer sits above our price.
+A markdown is the seller's claim; a comp is evidence. For each find the gate searches for the same piece at other sellers and asks how far the cheapest credible asking price sits above ours. Offers are current listings from a shopping search, not sold prices. All of this is plain code; the radar makes no model calls.
 
 ```mermaid
 flowchart TD

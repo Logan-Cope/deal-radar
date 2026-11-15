@@ -108,7 +108,7 @@ class Engine:
         return str(store.get("domain") or urlsplit(str(store.get("url", ""))).hostname or "")
 
     def comp_gate(self, alerts: list[Alert], report: CycleReport) -> list[Alert]:
-        """Drop the finds the market says are not cheap. Each item is looked up once:
+        """Drop the finds other sellers already list at a similar asking price. Each item is looked up once:
         the floor is cached by brand and model, and re-scored against today's price."""
         ccfg = self.cfg.section("comps")
         if not ccfg.get("enabled") or self.offers is None:

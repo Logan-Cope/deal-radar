@@ -17,7 +17,7 @@ def _lines(alert: Alert) -> list[str]:
     elif alert.previous_price:
         price += f" (was ${alert.previous_price:,.2f})"
     # The comp verdict rides in the reason after " · ". It gets its own line so
-    # the evidence (what everyone else charges) reads apart from the discount.
+    # the evidence (what other sellers are asking) reads apart from the discount.
     why, _, comp = alert.reason.partition(" · ")
     lines = [f"{alert.verdict} · {KIND_LABELS.get(alert.kind, alert.kind)}", title, price]
     if item.sizes_in_stock:

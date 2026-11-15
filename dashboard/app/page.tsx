@@ -14,7 +14,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
     <>
       <header className="masthead">
         <h1 className="wordmark">deal-radar</h1>
-        <p>A radar watches stores for underpriced pieces and checks each one against what the rest of the market charges. Nothing is bought until a person taps.</p>
+        <p>A radar watches stores for underpriced pieces and checks each one against what other sellers are asking for it right now. Nothing is bought until a person taps.</p>
         {demo ? (
           <form action={resetDemo}>
             <Submit className="btn btn-quiet">Reset demo</Submit>

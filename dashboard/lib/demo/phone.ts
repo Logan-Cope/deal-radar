@@ -63,7 +63,7 @@ export const PHONE_CARDS: PhoneCard[] = [
   },
 ];
 
-/** The evidence line under a card: what the rest of the market charges. */
+/** The evidence line under a card: what other sellers are asking for the same piece now. */
 export function compLine(comp: RadarComp): string {
   if (comp.verdict === "PASS" && comp.floor != null && comp.ratio != null) {
     const n = `${comp.matches} comp${comp.matches === 1 ? "" : "s"}`;

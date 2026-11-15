@@ -6,7 +6,7 @@ const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-
 
 export const metadata: Metadata = {
   title: "deal-radar",
-  description: "A radar finds underpriced pieces and checks each one against the market. A person approves every buy.",
+  description: "Software finds underpriced pieces and checks each one against what other sellers are asking. A person approves every buy.",
   icons: { icon: "/icon.svg" },
 };
 

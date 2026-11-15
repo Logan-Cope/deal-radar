@@ -1,12 +1,13 @@
 """The comp gate: is this actually cheap, or just marked down?
 
-A discount is the seller's claim. A comp is evidence from the market. For each
-find this module answers one question, *what is the cheapest price anyone else
-asks for this same thing*, and turns the answer into a verdict.
+A discount is the seller's claim. A comp is evidence: other sellers' current
+asking prices for the same piece. For each find this module answers one
+question, *what is the cheapest price anyone else asks for this same thing
+today*, and turns the answer into a verdict. Asking prices, not sold prices.
 
 It is deliberately not a profit model. Headroom is the gap to the cheapest
-competing offer after fees and shipping, not a prediction of what an item will
-sell for.
+competing listing after fees and shipping, not a prediction of what an item
+will sell for.
 
 Matching is the whole risk. Fetching prices is easy; knowing two listings are
 the same garment is where this lives or dies, and each filter below exists
