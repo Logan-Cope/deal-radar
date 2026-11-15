@@ -77,10 +77,28 @@ describe("replay", () => {
 
   it("round-trips through the cookie and rejects a tampered one", () => {
     const log = { today: TODAY, actions };
-    expect(decodeLog(encodeLog(log))).toEqual(log);
-    expect(decodeLog("not-base64-json")).toBeNull();
-    const forged = Buffer.from(JSON.stringify({ v: 1, today: TODAY, actions: [{ t: "tap", card: 1, d: "refund", at: 1 }] })).toString("base64url");
-    expect(decodeLog(forged)).toBeNull();
+    expect(decodeLog(encodeLog(log), TODAY)).toEqual(log);
+    expect(decodeLog("not-base64-json", TODAY)).toBeNull();
+    const forge = (body: unknown) => Buffer.from(JSON.stringify(body)).toString("base64url");
+    expect(decodeLog(forge({ v: 1, today: TODAY, actions: [{ t: "tap", card: 1, d: "refund", at: T }] }), TODAY)).toBeNull();
+    // A timestamp Date cannot format would break every page for this visitor.
+    expect(decodeLog(forge({ v: 1, today: TODAY, actions: [{ t: "resend", at: 1e16 }] }), TODAY)).toBeNull();
+  });
+
+  it("starts over from a log that is too big or from another week", () => {
+    expect(decodeLog(encodeLog({ today: "2026-11-01", actions }), TODAY)).toBeNull();
+    expect(decodeLog(encodeLog({ today: "2026-11-14", actions }), TODAY)).not.toBeNull();
+    expect(decodeLog("A".repeat(4000), TODAY)).toBeNull();
+    const many = Array.from({ length: 121 }, (): Action => ({ t: "next" }));
+    expect(decodeLog(encodeLog({ today: TODAY, actions: many }), TODAY)).toBeNull();
+  });
+
+  it("never reads live in the demo, even with READER=claude set", async () => {
+    vi.stubEnv("READER", "claude");
+    vi.stubEnv("ANTHROPIC_API_KEY", "");
+    const box = await replay({ today: TODAY, actions: [{ t: "note", item: "itm_halden", text: "trench came today! tag says M", at: T }] });
+    const reading = box.ledger.notes[0]!.reading;
+    expect(reading.status === "ready" && reading.source).toBe("fixture");
   });
 
   it("knows when the log would no longer fit in a cookie", () => {

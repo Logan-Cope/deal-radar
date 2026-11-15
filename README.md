@@ -113,10 +113,10 @@ The first cycle is silent on purpose: the first sight of a store is a baseline, 
 |---|---|
 | ![The phone with two radar cards next to the ledger list, with late and arrived items marked in red](docs/media/home-after-tap.png) | ![An item page where a note produced two suggested changes with highlighted evidence, and one change held back by the checks](docs/media/item-held.png) |
 
-The reader makes one structured-output call to `claude-opus-5-5` per note, then [`lib/reader/check.ts`](dashboard/lib/reader/check.ts) drops anything code can verify is wrong: evidence that is not a quote from the note, an amount its own evidence does not contain, a date after the note was written. What the checks held back is shown on the card rather than hidden. The demo answers from fixture readings in the model's exact output shape. To read live:
+The reader makes one structured-output call to `claude-opus-5-5` per note, then [`lib/reader/check.ts`](dashboard/lib/reader/check.ts) drops anything code can verify is wrong: evidence that is not a quote from the note, an amount its own evidence does not contain, a date after the note was written. What the checks held back is shown on the card rather than hidden. The demo answers from fixture readings in the model's exact output shape. Live readings run on a shared ledger only, where each note is read once:
 
 ```bash
-READER=claude ANTHROPIC_API_KEY=... npm run dev
+RADAR_TOKEN=dev LEDGER_PASSWORD=dev READER=claude ANTHROPIC_API_KEY=... npm run dev
 ```
 
 ## Guardrails
@@ -139,12 +139,23 @@ cd dashboard && npm run eval:reader
 ```
 
 - **Radar:** 45 tests over the differ, scorer, comp gate, store benching, the push queue, Telegram taps and the full three-cycle run against the local fixture server.
-- **Dashboard:** 60 unit tests (event idempotency, the reader's checks, Apply and Undo, demo replay, stages, the API route, shared-mode access) and 5 Playwright flows on desktop and phone viewports. The same flows run against the live demo with `BASE_URL=https://deal-radar-ledger.vercel.app npm run test:e2e`.
+- **Dashboard:** 62 unit tests (event idempotency, the reader's checks, Apply and Undo, demo replay, stages, the API route, shared-mode access) and 5 Playwright flows on desktop and phone viewports. The same flows run against the live demo with `BASE_URL=https://deal-radar-ledger.vercel.app npm run test:e2e`.
 - **Reader eval:** 7 cases written before the reader, including a question, a store's promise and an injection attempt that must produce nothing. The gate is precision 1.0 (nothing wrong reaches a person) and recall 0.9. CI scores the fixture readings through the real checks; `READER=claude npm run eval:reader -- --runs 3` scores the live model on the same cases.
 
 ## Running it for real
 
-Copy `radar/config.example.yaml` to `config.yaml`, add Shopify stores (`uv run deal-radar probe <url>` checks one), and set what you need in `.env` (see `radar/.env.example`): a Telegram bot for cards with Bought and Skip buttons, a Serper key for comp lookups, and `LEDGER_URL` plus `LEDGER_TOKEN` to push decisions to the dashboard, which takes the same value as `RADAR_TOKEN` and needs a `LEDGER_PASSWORD` of its own.
+1. Copy `radar/config.example.yaml` to `radar/config.yaml` and list your stores. `uv run deal-radar probe <url>` says whether a store publishes a catalogue.
+2. Set what you want in the environment. Nothing is required: with no variables set, cards go to the terminal and the outbox file.
+
+| Variable | Where | What it turns on |
+|---|---|---|
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | radar | Cards in a Telegram chat with Bought and Skip buttons; taps from any other chat are ignored |
+| `SERPER_API_KEY` | radar | Live comp lookups (`comps.source: serper` in the config) |
+| `RADAR_TOKEN`, `LEDGER_PASSWORD` | dashboard | Shared mode: one real ledger behind a password, and the radar's push endpoint |
+| `LEDGER_URL`, `LEDGER_TOKEN` | radar | Where to push decisions; `LEDGER_TOKEN` is the dashboard's `RADAR_TOKEN` |
+| `READER=claude`, `ANTHROPIC_API_KEY` | dashboard | Live note readings, in shared mode |
+
+3. Run it:
 
 ```bash
 uv run deal-radar poll --loop     # every ~5 minutes with jitter

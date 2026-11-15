@@ -25,7 +25,8 @@ export async function session(): Promise<Session> {
   const access = ledgerAccess((await headers()).get("authorization"));
   if (access === "denied" || access === "unconfigured") throw new NotAllowedError("The shared ledger needs its password.");
   if (sharedMode()) return { mode: "shared", box: sharedBox() };
-  const log = decodeLog((await cookies()).get(LOG_COOKIE)?.value) ?? { today: toDay(Date.now()), actions: [] };
+  const today = toDay(Date.now());
+  const log = decodeLog((await cookies()).get(LOG_COOKIE)?.value, today) ?? { today, actions: [] };
   return { mode: "demo", box: await replay(log), log };
 }
 

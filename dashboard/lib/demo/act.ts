@@ -7,14 +7,16 @@
 import { z } from "zod";
 import { nextId } from "@/lib/ledger/state";
 import { applySuggestion, dismissSuggestion, undoApply } from "@/lib/ledger/suggestions";
-import { readNote, type ReaderResult } from "@/lib/reader/read";
+import { fixtureComplete } from "@/lib/reader/fixtures";
+import { liveReader, readNote, type ReaderResult } from "@/lib/reader/read";
 import { boughtEvent, PHONE_CARDS, removedEvent } from "./phone";
-import { sendEvents, type Sandbox } from "./sandbox";
+import { sendEvents, sharedMode, type Sandbox } from "./sandbox";
 
 export const ACTOR = "You";
 export const MAX_NOTE = 1000;
 
-const at = z.number().int().nonnegative();
+/** Milliseconds, 2000 to 2100: a forged timestamp must not be able to make Date throw. */
+const at = z.number().int().min(946_684_800_000).max(4_102_444_800_000);
 export const actionSchema = z.discriminatedUnion("t", [
   z.object({ t: z.literal("tap"), card: z.number().int(), d: z.enum(["bought", "skipped"]), at }),
   z.object({ t: z.literal("undo"), card: z.number().int(), at }),
@@ -34,18 +36,24 @@ const iso = (ms: number) => new Date(ms).toISOString();
 const card = (alertId: number) => PHONE_CARDS.find((c) => c.alertId === alertId);
 
 /**
- * Readings by item, day and text. A replay of a fixture reading is cheap, but a
- * live reading (READER=claude) must not call the model again on every request.
+ * Live readings (READER=claude) run only on a shared ledger, which is behind
+ * its password and reads each note once. The demo replays a log the visitor's
+ * browser sends back on every request, so it always reads from the fixtures:
+ * an edited cookie can never make the server call a paid model.
  */
+export const readsLive = (): boolean => sharedMode() && liveReader();
+
+/** Readings by item, day and text, so a note is read once per process. */
 const readings = new Map<string, ReaderResult>();
 const MAX_CACHED = 500;
 
 async function cachedReading(box: Sandbox, itemId: string, text: string): Promise<ReaderResult> {
-  const key = `${itemId}|${box.today}|${text}`;
+  const live = readsLive();
+  const key = `${live ? "live" : "fixture"}|${itemId}|${box.today}|${text}`;
   const hit = readings.get(key);
   if (hit) return hit;
   const item = box.ledger.items.get(itemId)!;
-  const result = await readNote({ today: box.today, text, candidates: [item] });
+  const result = await readNote({ today: box.today, text, candidates: [item] }, live ? undefined : fixtureComplete);
   readings.set(key, result);
   if (readings.size > MAX_CACHED) readings.delete(readings.keys().next().value as string);
   return result;

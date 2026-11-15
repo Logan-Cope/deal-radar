@@ -7,7 +7,7 @@ import { MONEY_FIELDS, type ReaderField } from "@/lib/reader/schema";
 import { Submit } from "./submit";
 
 const FAILURES: Record<string, string> = {
-  no_fixture: "No reading: the demo has fixture readings for the sample notes only.",
+  no_fixture: "No reading: the demo reads the sample notes only.",
   no_api_key: "No reading: READER=claude is set but ANTHROPIC_API_KEY is not.",
   refusal: "No reading: the model declined this note.",
   timeout: "No reading: the model did not answer in time.",

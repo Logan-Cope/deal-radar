@@ -13,7 +13,7 @@ import { notesFor, updatesFor } from "@/lib/ledger/state";
 import type { Item } from "@/lib/ledger/types";
 import { byline } from "@/lib/ledger/via";
 import { sampleNotes } from "@/lib/reader/fixtures";
-import { liveReader } from "@/lib/reader/read";
+import { readsLive } from "@/lib/demo/act";
 
 function facts(item: Item, today: string): [string, string][] {
   const d = (day: string) => shortDate(day, today);
@@ -48,7 +48,7 @@ export default async function ItemPage({ params, searchParams }: { params: Promi
   if (!item) notFound();
   const status = statusLine(item, box.today);
   const notes = notesFor(box.ledger, item.id);
-  const samples = liveReader() ? [] : sampleNotes(item.id).filter((s) => !notes.some((n) => n.text === s));
+  const samples = readsLive() ? [] : sampleNotes(item.id).filter((s) => !notes.some((n) => n.text === s));
   const activity = updatesFor(box.ledger, item.id);
 
   return (
