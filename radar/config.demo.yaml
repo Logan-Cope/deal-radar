@@ -1,0 +1,51 @@
+# The demo: four fictional stores and one feed, served by the local fixture server.
+# `{fixtures}` is replaced with that server's address at run time.
+db_path: .demo/radar.db
+outbox_dir: .demo/outbox
+
+polling:
+  user_agent: "deal-radar/0.1 (demo)"
+  request_timeout_seconds: 5
+  error_bench_threshold: 2
+  error_cooldown_minutes: 60
+
+stores:
+  - {name: harbor-and-pine, url: "{fixtures}/harbor-and-pine", domain: harborandpine.example}
+  - {name: atelier-nord, url: "{fixtures}/atelier-nord", domain: ateliernord.example}
+  - {name: lowtide-supply, url: "{fixtures}/lowtide-supply", domain: lowtidesupply.example}
+  - {name: glasshouse, url: "{fixtures}/glasshouse", domain: glasshouse.example}
+
+feeds:
+  - {name: The Seam Report, url: "{fixtures}/feeds/seam-report.xml"}
+
+scoring:
+  min_discount_pct: 70
+  watchlist_brands: ["Orla Venn"]
+  watchlist_min_discount_pct: 60
+  max_price_absolute: 40
+  ignore_below_price: 1
+  exclude_keywords: ["gift card", "e-gift"]
+
+comps:
+  enabled: true
+  source: fixture
+  fixture_path: fixtures/offers.json
+  min_ratio: 2.5          # cheapest offer elsewhere must be at least 2.5x our price
+  min_headroom: 150       # and leave $150 after fees and shipping
+  fee_rate: 0.136
+  shipping: 18
+  min_matches: 1
+  scarce_min_brand_offers: 8
+  outlier_guard_gap: 2.0
+  outlier_guard_min_matches: 3
+  cache_days: 14
+  max_lookups_per_cycle: 60
+  send_scarce: true
+
+alerts:
+  max_per_cycle: 8
+  realert_min_further_drop_pct: 10
+
+drop_screen:
+  triggers: ["collab", "capsule", "limited", "exclusive"]
+  boosts: ["spring", "drop", "release"]

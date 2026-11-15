@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>The Seam Report</title>
+    <link>https://seam-report.example</link>
+    <description>A fictional fashion news feed for the demo.</description>
+    <item>
+      <title>Orla Venn and Kessler &amp; Rye announce a capsule collab for spring</title>
+      <link>https://seam-report.example/2026/orla-venn-kessler-rye-capsule</link>
+    </item>
+    <item>
+      <title>Isolde Park limited edition drop lands Friday</title>
+      <link>https://seam-report.example/2026/isolde-park-limited-drop</link>
+    </item>
+    <item>
+      <title>Ten ways to wear a trench this season</title>
+      <link>https://seam-report.example/2026/ten-ways-trench</link>
+    </item>
+    <item>
+      <title>Sato Field opens a second studio</title>
+      <link>https://seam-report.example/2026/sato-field-studio</link>
+    </item>
+  </channel>
+</rss>

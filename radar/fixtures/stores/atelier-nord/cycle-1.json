@@ -1,0 +1,73 @@
+{
+ "products": [
+  {
+   "id": 7008,
+   "title": "Vesper Satin Midi Skirt",
+   "handle": "vesper-satin-midi-skirt",
+   "vendor": "Isolde Park",
+   "images": [],
+   "variants": [
+    {
+     "id": 700800,
+     "title": "36",
+     "price": "365.00",
+     "compare_at_price": "365.00",
+     "available": true
+    },
+    {
+     "id": 700801,
+     "title": "38",
+     "price": "365.00",
+     "compare_at_price": "365.00",
+     "available": true
+    },
+    {
+     "id": 700802,
+     "title": "40",
+     "price": "365.00",
+     "compare_at_price": "365.00",
+     "available": true
+    }
+   ]
+  },
+  {
+   "id": 7009,
+   "title": "Dune Ribbed Tank Chalk",
+   "handle": "dune-ribbed-tank-chalk",
+   "vendor": "Marlow Atelier",
+   "images": [],
+   "variants": [
+    {
+     "id": 700900,
+     "title": "S",
+     "price": "120.00",
+     "compare_at_price": "120.00",
+     "available": true
+    },
+    {
+     "id": 700901,
+     "title": "M",
+     "price": "120.00",
+     "compare_at_price": "120.00",
+     "available": true
+    }
+   ]
+  },
+  {
+   "id": 7010,
+   "title": "Hollis Tote Black",
+   "handle": "hollis-tote-black",
+   "vendor": "Sato Field",
+   "images": [],
+   "variants": [
+    {
+     "id": 701000,
+     "title": "One size",
+     "price": "540.00",
+     "compare_at_price": "540.00",
+     "available": true
+    }
+   ]
+  }
+ ]
+}

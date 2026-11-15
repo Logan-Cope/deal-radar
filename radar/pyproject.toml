@@ -1,0 +1,41 @@
+[project]
+name = "deal-radar"
+version = "0.1.0"
+description = "Watches stores for underpriced items, checks each find against the market, and asks a person before anything is bought."
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = [
+    "httpx>=0.27",
+    "pyyaml>=6.0",
+    "feedparser>=6.0",
+]
+
+[project.scripts]
+deal-radar = "deal_radar.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff>=0.6", "mypy>=1.11", "types-PyYAML"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deal_radar"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src"]
+warn_unused_ignores = true
+disallow_untyped_defs = true
+ignore_missing_imports = true

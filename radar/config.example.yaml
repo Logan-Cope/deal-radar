@@ -1,0 +1,48 @@
+# Copy to config.yaml and point it at real stores. Shopify storefronts publish
+# /products.json; run `deal-radar probe <url>` before adding one.
+db_path: radar.db
+outbox_dir: outbox
+
+polling:
+  user_agent: "deal-radar/0.1 (personal deal monitor)"
+  request_timeout_seconds: 20
+  interval_seconds: 300
+  jitter_seconds: 60
+  error_bench_threshold: 3
+  error_cooldown_minutes: 60
+
+stores:
+  - {name: example-store, url: "https://shop.example.com", domain: shop.example.com}
+
+feeds: []
+
+scoring:
+  min_discount_pct: 70
+  watchlist_brands: []
+  watchlist_min_discount_pct: 60
+  max_price_absolute: 40
+  ignore_below_price: 1
+  exclude_keywords: ["gift card", "e-gift"]
+
+comps:
+  enabled: true
+  source: serper          # needs SERPER_API_KEY; about $0.001 a lookup, cached by brand and model
+  min_ratio: 2.5
+  min_headroom: 150
+  fee_rate: 0.136
+  shipping: 18
+  min_matches: 1
+  scarce_min_brand_offers: 15
+  outlier_guard_gap: 2.0
+  outlier_guard_min_matches: 3
+  cache_days: 14
+  max_lookups_per_cycle: 60
+  send_scarce: true
+
+alerts:
+  max_per_cycle: 8
+  realert_min_further_drop_pct: 10
+
+drop_screen:
+  triggers: ["collab", "capsule", "limited"]
+  boosts: []

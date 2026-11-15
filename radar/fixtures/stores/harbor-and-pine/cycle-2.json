@@ -1,0 +1,177 @@
+{
+ "products": [
+  {
+   "id": 7002,
+   "title": "Tessel Field Boot Tan",
+   "handle": "tessel-field-boot-tan",
+   "vendor": "Orla Venn",
+   "images": [],
+   "variants": [
+    {
+     "id": 700200,
+     "title": "37",
+     "price": "96.00",
+     "compare_at_price": "640.00",
+     "available": true
+    },
+    {
+     "id": 700201,
+     "title": "38",
+     "price": "96.00",
+     "compare_at_price": "640.00",
+     "available": true
+    },
+    {
+     "id": 700202,
+     "title": "39",
+     "price": "96.00",
+     "compare_at_price": "640.00",
+     "available": true
+    },
+    {
+     "id": 700203,
+     "title": "40",
+     "price": "96.00",
+     "compare_at_price": "640.00",
+     "available": true
+    }
+   ]
+  },
+  {
+   "id": 7003,
+   "title": "Arden Wrap Dress Ink",
+   "handle": "arden-wrap-dress-ink",
+   "vendor": "Kessler & Rye",
+   "images": [],
+   "variants": [
+    {
+     "id": 700300,
+     "title": "XS",
+     "price": "120.00",
+     "compare_at_price": "480.00",
+     "available": true
+    },
+    {
+     "id": 700301,
+     "title": "S",
+     "price": "120.00",
+     "compare_at_price": "480.00",
+     "available": true
+    },
+    {
+     "id": 700302,
+     "title": "M",
+     "price": "120.00",
+     "compare_at_price": "480.00",
+     "available": true
+    },
+    {
+     "id": 700303,
+     "title": "L",
+     "price": "120.00",
+     "compare_at_price": "480.00",
+     "available": true
+    }
+   ]
+  },
+  {
+   "id": 7004,
+   "title": "Rowan Knit Cardigan Oat",
+   "handle": "rowan-knit-cardigan-oat",
+   "vendor": "Sato Field",
+   "images": [],
+   "variants": [
+    {
+     "id": 700400,
+     "title": "S",
+     "price": "85.00",
+     "compare_at_price": "340.00",
+     "available": true
+    },
+    {
+     "id": 700401,
+     "title": "M",
+     "price": "85.00",
+     "compare_at_price": "340.00",
+     "available": true
+    }
+   ]
+  },
+  {
+   "id": 7005,
+   "title": "Harbor & Pine Gift Card",
+   "handle": "gift-card",
+   "vendor": "Harbor & Pine",
+   "images": [],
+   "variants": [
+    {
+     "id": 700500,
+     "title": "$50",
+     "price": "50.00",
+     "compare_at_price": null,
+     "available": true
+    }
+   ]
+  },
+  {
+   "id": 7006,
+   "title": "Linen Camp Shirt Sage",
+   "handle": "linen-camp-shirt-sage",
+   "vendor": "Marlow Atelier",
+   "images": [],
+   "variants": [
+    {
+     "id": 700600,
+     "title": "S",
+     "price": "168.00",
+     "compare_at_price": "210.00",
+     "available": true
+    },
+    {
+     "id": 700601,
+     "title": "M",
+     "price": "168.00",
+     "compare_at_price": "210.00",
+     "available": true
+    },
+    {
+     "id": 700602,
+     "title": "L",
+     "price": "168.00",
+     "compare_at_price": "210.00",
+     "available": true
+    }
+   ]
+  },
+  {
+   "id": 7007,
+   "title": "Keel Pleated Trouser Navy",
+   "handle": "keel-pleated-trouser-navy",
+   "vendor": "Vantor",
+   "images": [],
+   "variants": [
+    {
+     "id": 700700,
+     "title": "26",
+     "price": "295.00",
+     "compare_at_price": "295.00",
+     "available": true
+    },
+    {
+     "id": 700701,
+     "title": "27",
+     "price": "295.00",
+     "compare_at_price": "295.00",
+     "available": true
+    },
+    {
+     "id": 700702,
+     "title": "28",
+     "price": "295.00",
+     "compare_at_price": "295.00",
+     "available": true
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,57 @@
+{
+ "products": [
+  {
+   "id": 7013,
+   "title": "Pell Loafer Espresso",
+   "handle": "pell-loafer-espresso",
+   "vendor": "Sato Field",
+   "images": [],
+   "variants": [
+    {
+     "id": 701300,
+     "title": "37",
+     "price": "70.00",
+     "compare_at_price": "380.00",
+     "available": false
+    },
+    {
+     "id": 701301,
+     "title": "38",
+     "price": "70.00",
+     "compare_at_price": "380.00",
+     "available": false
+    },
+    {
+     "id": 701302,
+     "title": "39",
+     "price": "70.00",
+     "compare_at_price": "380.00",
+     "available": false
+    }
+   ]
+  },
+  {
+   "id": 7014,
+   "title": "Ferro Belted Coat Camel",
+   "handle": "ferro-belted-coat-camel",
+   "vendor": "Kessler & Rye",
+   "images": [],
+   "variants": [
+    {
+     "id": 701400,
+     "title": "S",
+     "price": "690.00",
+     "compare_at_price": "690.00",
+     "available": true
+    },
+    {
+     "id": 701401,
+     "title": "M",
+     "price": "690.00",
+     "compare_at_price": "690.00",
+     "available": true
+    }
+   ]
+  }
+ ]
+}
