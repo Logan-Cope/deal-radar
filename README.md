@@ -136,7 +136,9 @@ RADAR_TOKEN=dev LEDGER_PASSWORD=dev READER=claude ANTHROPIC_API_KEY=... npm run 
 
 ```bash
 cd radar && uv run pytest && uv run ruff check . && uv run mypy
-cd dashboard && npm run check && npm run test:e2e
+cd dashboard && npm run check
+cd dashboard && npx playwright install chromium   # once, before the e2e tests
+cd dashboard && npm run test:e2e                  # builds the app, then serves it
 cd dashboard && npm run eval:reader
 ```
 

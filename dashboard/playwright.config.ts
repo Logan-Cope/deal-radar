@@ -14,5 +14,5 @@ export default defineConfig({
   ],
   webServer: external
     ? undefined
-    : { command: "npm run start -- -p 3100 -H 127.0.0.1", url: "http://127.0.0.1:3100", reuseExistingServer: !process.env.CI, timeout: 60_000 },
+    : { command: "npm run build && npm run start -- -p 3100 -H 127.0.0.1", url: "http://127.0.0.1:3100", reuseExistingServer: !process.env.CI, timeout: 240_000 },
 });
