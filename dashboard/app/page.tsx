@@ -3,14 +3,13 @@ import { EventLog } from "@/components/event-log";
 import { Ledger } from "@/components/ledger";
 import { Phone } from "@/components/phone";
 import { Submit } from "@/components/submit";
-import { sharedMode } from "@/lib/demo/sandbox";
 import { session } from "@/lib/demo/session";
 import { isTab } from "@/lib/ledger/stage";
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
-  const { box } = await session();
-  const { tab } = await searchParams;
-  const demo = !sharedMode();
+export default async function Home({ searchParams }: { searchParams: Promise<{ tab?: string; problem?: string }> }) {
+  const s = await session();
+  const { tab, problem } = await searchParams;
+  const demo = s.mode === "demo";
   return (
     <>
       <header className="masthead">
@@ -22,12 +21,17 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
           </form>
         ) : null}
       </header>
+      {problem ? (
+        <p className="problem page-problem" role="alert">
+          {problem}
+        </p>
+      ) : null}
       <main className={demo ? "desk" : "desk desk-shared"}>
-        {demo ? <Phone box={box} /> : null}
-        <Ledger box={box} tab={isTab(tab) ? tab : "all"} />
-        {demo ? <EventLog box={box} /> : null}
+        {demo ? <Phone box={s.box} /> : null}
+        <Ledger box={s.box} tab={isTab(tab) ? tab : "all"} />
+        {demo ? <EventLog box={s.box} /> : null}
       </main>
-      {demo ? <footer className="footer-note">Every store, brand, price and person here is invented. This page has its own private copy of the data.</footer> : null}
+      {demo ? <footer className="footer-note">Every store, brand, price and person here is invented. What you do here is kept in your own browser only.</footer> : null}
     </>
   );
 }

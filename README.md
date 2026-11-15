@@ -2,13 +2,15 @@
 
 Agents find the deals, a person approves every buy.
 
+[![CI](https://github.com/Logan-Cope/deal-radar/actions/workflows/ci.yml/badge.svg)](https://github.com/Logan-Cope/deal-radar/actions/workflows/ci.yml)
+
 ![The demo: a radar card arrives, a tap on Bought puts the item in the ledger, and a free-form note becomes a suggestion card with its evidence highlighted](docs/media/demo.gif)
 
 deal-radar watches online stores for underpriced pieces, checks each find against what the rest of the market charges, and sends a card to a person's phone with the evidence attached. The person taps Bought or Skip. A buy lands in a ledger, where a free-form note like "listed the boots on ebay yesterday for 425" is read by Claude into suggested changes, each with the quote that backs it. Nothing is written until the person taps Apply, and nothing in this repository can spend money.
 
 It is a public rewrite of a radar I run for my own resale buying. Every store, brand, price and person in it is invented, and the demo runs on fixtures with no API keys.
 
-**Live demo:** _the Vercel link goes here once deployed_ (each visitor gets a private sandbox that resets)
+**Live demo: [deal-radar-ledger.vercel.app](https://deal-radar-ledger.vercel.app)**. Tap Bought on a card, open an item, try a sample note. What you do is kept in your own browser, and no key is involved.
 
 ## Run it in two minutes
 
@@ -137,7 +139,7 @@ cd dashboard && npm run eval:reader
 ```
 
 - **Radar:** 45 tests over the differ, scorer, comp gate, store benching, the push queue, Telegram taps and the full three-cycle run against the local fixture server.
-- **Dashboard:** 56 unit tests (event idempotency, the reader's checks, Apply and Undo, stages, the API route, shared-mode access) and 5 Playwright flows on desktop and phone viewports.
+- **Dashboard:** 60 unit tests (event idempotency, the reader's checks, Apply and Undo, demo replay, stages, the API route, shared-mode access) and 5 Playwright flows on desktop and phone viewports. The same flows run against the live demo with `BASE_URL=https://deal-radar-ledger.vercel.app npm run test:e2e`.
 - **Reader eval:** 7 cases written before the reader, including a question, a store's promise and an injection attempt that must produce nothing. The gate is precision 1.0 (nothing wrong reaches a person) and recall 0.9. CI scores the fixture readings through the real checks; `READER=claude npm run eval:reader -- --runs 3` scores the live model on the same cases.
 
 ## Running it for real

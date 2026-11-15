@@ -1,45 +1,93 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { boughtEvent, PHONE_CARDS, removedEvent } from "@/lib/demo/phone";
-import { resetSandbox, sandboxFor, sendEvents } from "@/lib/demo/sandbox";
 import { POST } from "@/app/api/radar/events/route";
+import { applyAction, type Action } from "@/lib/demo/act";
+import { decodeLog, encodeLog, fitsInCookie } from "@/lib/demo/log";
+import { boughtEvent, PHONE_CARDS } from "@/lib/demo/phone";
+import { newSandbox, resetShared, sendEvents, sharedBox } from "@/lib/demo/sandbox";
+import { replay } from "@/lib/demo/session";
 
-const NOW = "2026-11-15T12:00:00.000Z";
+const TODAY = "2026-11-15";
+const T = Date.parse(`${TODAY}T15:00:00Z`);
 const card = PHONE_CARDS[0]!;
 
 afterEach(() => {
   vi.unstubAllEnvs();
-  resetSandbox("a");
-  resetSandbox("b");
+  resetShared();
 });
 
-describe("sandboxes", () => {
-  it("keeps visitors apart", () => {
-    const a = sandboxFor("a");
-    sendEvents(a, [boughtEvent(card, "e1", "You", NOW)], NOW);
-    expect(a.ledger.items.size).toBe(6);
-    expect(sandboxFor("b").ledger.items.size).toBe(5);
-  });
+async function run(actions: Action[]) {
+  const box = newSandbox(TODAY);
+  const outcomes = [];
+  for (const a of actions) outcomes.push(await applyAction(box, a));
+  return { box, outcomes };
+}
 
-  it("logs each event with the ledger's answer, and a resend is a duplicate", () => {
-    const box = sandboxFor("a");
-    sendEvents(box, [boughtEvent(card, "e1", "You", NOW)], NOW);
-    sendEvents(box, [box.lastEvent!], NOW);
-    expect(box.log.map((l) => l.status)).toEqual(["duplicate", "applied"]);
+describe("demo actions", () => {
+  it("a tap on Bought sends the radar's event, and a resend is a duplicate", async () => {
+    const { box } = await run([
+      { t: "tap", card: card.alertId, d: "bought", at: T },
+      { t: "resend", at: T + 1 },
+    ]);
     expect(box.ledger.items.size).toBe(6);
+    expect(box.log.map((l) => l.status)).toEqual(["duplicate", "applied"]);
   });
 
-  it("undoes a buy from the phone while nobody has touched it", () => {
-    const box = sandboxFor("a");
-    sendEvents(box, [boughtEvent(card, "e1", "You", NOW)], NOW);
-    const [result] = sendEvents(box, [removedEvent(card, "e2", "You", NOW)], NOW);
-    expect(result?.status).toBe("applied");
+  it("a skip records the decision and sends nothing", async () => {
+    const { box } = await run([{ t: "tap", card: card.alertId, d: "skipped", at: T }]);
+    expect(box.log).toEqual([]);
+    expect(box.decisions.get(card.alertId)).toBe("skipped");
+  });
+
+  it("undo removes an untouched buy, and a second tap on the same card is ignored", async () => {
+    const { box, outcomes } = await run([
+      { t: "tap", card: card.alertId, d: "bought", at: T },
+      { t: "tap", card: card.alertId, d: "skipped", at: T + 1 },
+      { t: "undo", card: card.alertId, at: T + 2 },
+    ]);
+    expect(outcomes.map((o) => o.changed)).toEqual([true, false, true]);
     expect(box.ledger.items.size).toBe(5);
   });
 
-  it("starts fresh after a reset", () => {
-    sendEvents(sandboxFor("a"), [boughtEvent(card, "e1", "You", NOW)], NOW);
-    resetSandbox("a");
-    expect(sandboxFor("a").ledger.items.size).toBe(5);
+  it("a note is read, and a refused Apply reports why", async () => {
+    const { box, outcomes } = await run([
+      { t: "note", item: "itm_halden", text: "trench came today! tag says M", at: T },
+      { t: "apply", note: "note_does_not_exist", lines: [0], at: T + 1 },
+    ]);
+    expect(box.ledger.notes[0]?.reading.status).toBe("ready");
+    expect(outcomes[1]).toMatchObject({ changed: false, problem: "Nothing to apply." });
+  });
+});
+
+describe("replay", () => {
+  const actions: Action[] = [
+    { t: "tap", card: card.alertId, d: "bought", at: T },
+    { t: "next" },
+    { t: "note", item: "itm_tessel", text: "listed the tessel boots on ebay yesterday for 425", at: T + 10 },
+  ];
+
+  it("rebuilds the same ledger from the same log, ids included", async () => {
+    const first = await replay({ today: TODAY, actions });
+    const noteId = first.ledger.notes[0]!.id;
+    const withApply = await replay({ today: TODAY, actions: [...actions, { t: "apply", note: noteId, lines: [0, 1, 2], at: T + 20 }] });
+    expect(withApply.ledger.items.get("itm_tessel")).toMatchObject({ postedWhere: "eBay", postedPriceCents: 42500 });
+    const again = await replay({ today: TODAY, actions });
+    expect([...again.ledger.items.keys()]).toEqual([...first.ledger.items.keys()]);
+    expect(again.shown).toBe(2);
+  });
+
+  it("round-trips through the cookie and rejects a tampered one", () => {
+    const log = { today: TODAY, actions };
+    expect(decodeLog(encodeLog(log))).toEqual(log);
+    expect(decodeLog("not-base64-json")).toBeNull();
+    const forged = Buffer.from(JSON.stringify({ v: 1, today: TODAY, actions: [{ t: "tap", card: 1, d: "refund", at: 1 }] })).toString("base64url");
+    expect(decodeLog(forged)).toBeNull();
+  });
+
+  it("knows when the log would no longer fit in a cookie", () => {
+    const long = "x".repeat(900);
+    const notes = (n: number): Action[] => Array.from({ length: n }, (_, i) => ({ t: "note", item: "itm_tessel", text: long, at: T + i }));
+    expect(fitsInCookie({ today: TODAY, actions: notes(1) })).toBe(true);
+    expect(fitsInCookie({ today: TODAY, actions: notes(4) })).toBe(false);
   });
 });
 
@@ -59,18 +107,24 @@ describe("POST /api/radar/events", () => {
     expect(await res.json()).toEqual({ error: "bad_token" });
   });
 
-  it("answers one result per event, in order", async () => {
+  it("answers one result per event, in order, on the shared ledger", async () => {
     vi.stubEnv("RADAR_TOKEN", "s3cret-token");
-    const event = boughtEvent(card, "api-1", "Sam", NOW);
+    const event = boughtEvent(card, "api-1", "Sam", `${TODAY}T12:00:00.000Z`);
     const res = await post({ events: [event, event, { id: "x", type: "nope" }] }, "s3cret-token");
     expect(res.status).toBe(200);
     const { results } = await res.json();
     expect(results.map((r: { status: string }) => r.status)).toEqual(["applied", "duplicate", "rejected"]);
-    resetSandbox("shared");
+    expect(sharedBox().ledger.items.size).toBe(6);
   });
 
   it("refuses more than 50 events in one request", async () => {
     vi.stubEnv("RADAR_TOKEN", "s3cret-token");
     expect((await post({ events: Array.from({ length: 51 }, () => ({})) }, "s3cret-token")).status).toBe(413);
+  });
+
+  it("keeps the event log to the last 20 answers", () => {
+    const box = newSandbox(TODAY);
+    for (let i = 0; i < 25; i++) sendEvents(box, [boughtEvent(card, `e${i}`, "Sam", `${TODAY}T12:00:00.000Z`)], `${TODAY}T12:00:00.000Z`);
+    expect(box.log).toHaveLength(20);
   });
 });

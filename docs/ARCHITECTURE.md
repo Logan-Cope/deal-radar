@@ -143,4 +143,19 @@ An item's stage is whichever date it has furthest along. One status line per row
 
 ## 5. Where the demo keeps its data
 
-The public demo gives every visitor a private sandbox in server memory, keyed by a cookie and seeded fresh. Sandboxes are capped and the least recently used is dropped. A server restart resets everything. With `RADAR_TOKEN` set, the app switches to one shared ledger and enables `/api/radar/events` for a real radar. A shared ledger needs `LEDGER_PASSWORD`: the proxy asks for it with HTTP Basic, `session()` checks it again for every page and server action, the demo-only controls (the phone, the event replay, the reset) are refused, and without a password set the app answers 503 rather than serve an open ledger. The production system this is rewritten from keeps the ledger in Postgres; the event and suggestion logic is the same, which is why it lives in plain functions over a state object rather than in route handlers.
+The public demo keeps no state on the server. Every action a visitor takes (a tap, a note, an Apply) is recorded as a small Action with its own timestamp in a cookie in their browser (`lib/demo/log.ts`). On every request the server rebuilds that visitor's ledger from the seed by replaying their actions through the same `applyAction` the forms use (`lib/demo/act.ts`). Replays are deterministic, ids included, so a form rendered by one serverless instance works when the next request lands on another. The first version kept sandboxes in server memory; on Vercel an Undo landed on an instance that had never seen the buy, and the e2e suite run against the deployment caught it. The log is capped to what a cookie holds, and the page says so when it is full. Fixture readings make replay cheap; live readings are cached so a replay never calls the model twice for the same note.
+
+```mermaid
+sequenceDiagram
+    participant B as Browser (cookie: action log)
+    participant S as Any server instance
+    B->>S: POST Apply note_3 (cookie: [tap 101, note, ...])
+    S->>S: seed + replay the log
+    S->>S: apply the new action
+    S-->>B: Set-Cookie: log + [apply note_3]
+    B->>S: GET /items/itm_tessel (new cookie)
+    S->>S: seed + replay, same ledger on any instance
+    S-->>B: the page
+```
+
+With `RADAR_TOKEN` set, the app switches to one shared ledger and enables `/api/radar/events` for a real radar. A shared ledger needs `LEDGER_PASSWORD`: the proxy asks for it with HTTP Basic, `session()` checks it again for every page and server action, the demo-only controls (the phone, the event replay, the reset) are refused, and without a password set the app answers 503 rather than serve an open ledger. The production system this is rewritten from keeps the ledger in Postgres; the event and suggestion logic is the same, which is why it lives in plain functions over a state object rather than in route handlers.

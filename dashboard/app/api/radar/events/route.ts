@@ -5,7 +5,7 @@
  */
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
-import { sandboxFor, sendEvents } from "@/lib/demo/sandbox";
+import { sendEvents, sharedBox } from "@/lib/demo/sandbox";
 import { MAX_EVENTS_PER_REQUEST } from "@/lib/ledger/events";
 
 function tokenMatches(header: string | null, token: string): boolean {
@@ -29,6 +29,6 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (!Array.isArray(events)) return NextResponse.json({ error: "expected {\"events\": [...]}" }, { status: 400 });
   if (events.length > MAX_EVENTS_PER_REQUEST) return NextResponse.json({ error: "too_many_events" }, { status: 413 });
 
-  const results = sendEvents(sandboxFor("shared"), events, new Date().toISOString());
+  const results = sendEvents(sharedBox(), events, new Date().toISOString());
   return NextResponse.json({ results });
 }

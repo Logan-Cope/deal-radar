@@ -72,13 +72,13 @@ The calls that shaped this design, with what was given up for each.
 
 **Why:** precision is the number that matters to the person. A missed change costs a tap; a wrong one, applied by habit, corrupts the ledger. The gate says which trade to make.
 
-## The demo is a sandbox per visitor
+## The demo is event-sourced in the visitor's browser
 
-**Decision:** the public demo keeps each visitor's ledger in server memory, keyed by a cookie, seeded fresh, with no write endpoint exposed.
+**Decision:** the public demo keeps each visitor's history as a list of actions in their own cookie, and the server rebuilds their ledger from the seed on every request. No write endpoint is exposed.
 
-**Why:** a shared demo would show one visitor another's notes, and free text from strangers is not something to display to the next person. Memory needs no database account, and a reset is a restart.
+**Why:** a shared demo would show one visitor another's notes, and free text from strangers is not something to display to the next person. The first version kept a sandbox per visitor in server memory, which worked locally and failed on Vercel, where consecutive requests land on different instances: an Undo reached an instance that had never seen the buy. Replaying a short action log through the same functions the forms use makes every instance agree without a database.
 
-**Given up:** persistence. A sandbox can vanish when the server instance is recycled, which is the right failure for a demo.
+**Given up:** history length. A cookie holds about 4 KB, so a visitor can take a few dozen actions before the demo asks for a reset.
 
 ## Not in this repository
 
